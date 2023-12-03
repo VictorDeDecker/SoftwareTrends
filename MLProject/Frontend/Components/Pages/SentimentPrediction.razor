@@ -1,0 +1,37 @@
+﻿@page "/sentimentPrediction"
+@using MLProject
+@rendermode InteractiveServer
+
+<PageTitle>Sentiment</PageTitle>
+
+<h1>Sentiment ML model</h1>
+
+<label>Type a negative or positive sentence</label>
+<InputText @bind-Value=@userSentiment></InputText>
+<br />
+<button class="btn btn-primary" @onclick=@PredictSentiment>Predict sentiment</button>
+
+@if (pressedButton)
+{
+    <p>That was a @result sentence</p>
+}
+
+@code {
+    private string userSentiment;
+    private string result;
+    private string score;
+    private bool pressedButton = false;
+
+    public void PredictSentiment()
+    {
+        var sampleData = new SentimentModel.ModelInput()
+            {
+                Col0 = userSentiment,
+            };
+
+        var result = SentimentModel.Predict(sampleData);
+
+        this.result = result.PredictedLabel == 1 ? "positive" : "negative";
+        pressedButton = true;
+    }
+}

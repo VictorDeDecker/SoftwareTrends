@@ -1,0 +1,41 @@
+﻿@page "/imageClassification"
+@using MLProject2
+@rendermode InteractiveServer
+
+<PageTitle>CatvsDog</PageTitle>
+
+<h1>Dog vs Cat</h1>
+
+<InputFile OnChange="GetUpload" accept="image/png, image/jpeg, image/gif">Upload an image of a cat or dog</InputFile>
+
+<br />
+<br />
+
+@if (Result != null)
+{
+    <p>Category: @Result</p>
+}
+
+@code {
+    private string Result;
+
+    private async Task GetUpload(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+                CatvsDog.ModelInput sampleData = new CatvsDog.ModelInput()
+                    {
+                        ImageSource = imageBytes,
+                    };
+
+                var result = CatvsDog.Predict(sampleData);
+                Result = result.PredictedLabel;
+            }
+        }
+    }
+}
